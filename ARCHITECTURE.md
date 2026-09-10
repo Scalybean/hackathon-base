@@ -67,6 +67,13 @@ would recurse. Definer rights break the loop, and the function is pinned with
 policies. `force` closes that. `check:rls` fails on a table that has one without the
 other.
 
+**No realtime.** `supabase-js` builds a RealtimeClient inside `createClient()`,
+which needs a global `WebSocket` that Node 20 does not have, so `createClient()`
+throws before a single query runs. Every client that does not subscribe to
+anything passes a stub as `realtime.transport` (`src/lib/supabase/no-realtime.ts`),
+which skips the lookup entirely. Deleting the stub and running Node 22+ is all it
+takes to enable realtime later.
+
 **The rate limiter is one interface, two implementations.** In-memory by default,
 Upstash over REST when the two env vars are present — no SDK, just two pipelined
 Redis commands. The Upstash path fails **closed**: an unreachable limiter must not
@@ -107,10 +114,20 @@ Four independent layers say no. Remove any one and the other three still hold.
 | --- | --- | --- |
 | local | `hackathon-base-dev` | `.env.local` |
 | preview | `hackathon-base-dev` | Preview + Development |
-| production | `hackathon-base-prod` | Production |
+| production | `hackathon-base-dev` | Production |
 
-Previews must never point at production data. See README for how the variables are
-scoped per environment.
+Production and preview currently share one database, because the Supabase free
+tier allows two active projects per owner and both slots are spoken for. This is a
+deliberate, recorded compromise, not an oversight. Nothing in the code assumes a
+single project: splitting them is three environment variables and a `pnpm db:push`.
+
+`NEXT_PUBLIC_SITE_URL` is set for Production only. Preview and Development fall
+through to the deployment's own URL (`src/lib/site-url.ts`), so a preview's
+confirmation email returns to that preview rather than to production. Supabase's
+redirect allow-list needs a wildcard entry for this to work; the README has it.
+
+Deployment protection is on for previews and off for production, so the demo URL is
+publicly reachable while preview builds still require a Vercel login.
 
 ## What is generated, and by what
 

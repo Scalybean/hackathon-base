@@ -6,6 +6,8 @@
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 
+import { noRealtime } from '../src/lib/supabase/no-realtime';
+
 config({ path: '.env.local', quiet: true });
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -24,6 +26,7 @@ if (process.env.SEED_ALLOW_PROD !== 'true' && /prod/i.test(process.env.SUPABASE_
 
 const admin = createClient(url, serviceRole, {
   auth: { persistSession: false, autoRefreshToken: false },
+  ...noRealtime,
 });
 
 type SeedUser = {

@@ -7,7 +7,9 @@ import { z } from 'zod';
 const clientEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(20),
-  NEXT_PUBLIC_SITE_URL: z.url(),
+  // Optional: on Vercel previews the deployment URL is used instead, so a
+  // preview's auth emails come back to that preview. See @/lib/site-url.
+  NEXT_PUBLIC_SITE_URL: z.url().optional(),
 });
 
 // Next.js inlines NEXT_PUBLIC_* only when referenced as full literals, so the

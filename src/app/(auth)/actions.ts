@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation';
 
 import { action } from '@/lib/api/action';
 import { ApiError } from '@/lib/api/errors';
-import { clientEnv } from '@/lib/env/client';
+import { siteUrl } from '@/lib/site-url';
 import { safeRedirect } from '@/lib/safe-redirect';
 import {
   forgotPasswordSchema,
@@ -64,7 +64,7 @@ export const signUpAction = action(
         // display_name is client-controlled; the signup trigger sanitises it
         // before it reaches profiles. Nothing here can set a role.
         data: { display_name: input.displayName },
-        emailRedirectTo: `${clientEnv.NEXT_PUBLIC_SITE_URL}/auth/confirm?next=/dashboard`,
+        emailRedirectTo: `${siteUrl()}/auth/confirm?next=/dashboard`,
       },
     });
 
@@ -87,7 +87,7 @@ export const forgotPasswordAction = action(
   },
   async ({ input, supabase }) => {
     await supabase.auth.resetPasswordForEmail(input.email, {
-      redirectTo: `${clientEnv.NEXT_PUBLIC_SITE_URL}/auth/confirm?next=/reset-password`,
+      redirectTo: `${siteUrl()}/auth/confirm?next=/reset-password`,
     });
     return { email: input.email };
   },

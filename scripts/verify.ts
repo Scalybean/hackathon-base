@@ -38,7 +38,11 @@ const STEPS: Step[] = [
     command: 'tsx',
     args: ['scripts/check-rls.ts'],
     fix: 'Add a migration under supabase/migrations/ and `pnpm db:push`. See PATTERNS.md §1.',
-    skipIf: () => (process.env.SUPABASE_DB_URL ? null : 'SUPABASE_DB_URL not set'),
+    skipIf: () =>
+      process.env.SUPABASE_DB_URL ||
+      (process.env.SUPABASE_ACCESS_TOKEN && process.env.SUPABASE_PROJECT_REF)
+        ? null
+        : 'set SUPABASE_ACCESS_TOKEN (+ SUPABASE_PROJECT_REF) or SUPABASE_DB_URL',
   },
   {
     name: 'build',

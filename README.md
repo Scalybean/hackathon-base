@@ -4,6 +4,8 @@ A Next.js + Supabase base template with the security work already done: RLS on e
 table, cookie sessions, rate limiting, a private storage bucket, and a design system
 that does not look generated.
 
+**Live:** https://hackathon-base-alons-projects-d6deeccc.vercel.app
+
 **Agents start at [`CLAUDE.md`](CLAUDE.md), then [`PATTERNS.md`](PATTERNS.md).**
 Humans start here.
 
@@ -83,74 +85,88 @@ say anything works.
 | [`PROMPTS.md`](PROMPTS.md) | prompts to paste on the day |
 | `/styleguide` | every UI primitive in every variant and state |
 
-## Two Supabase projects
-
-Previews must never touch production data.
+## One Supabase project, for now
 
 | | Supabase project | Vercel environment |
 | --- | --- | --- |
 | local | `hackathon-base-dev` | `.env.local` |
 | preview branches | `hackathon-base-dev` | Preview + Development |
-| production | `hackathon-base-prod` | Production |
+| production | `hackathon-base-dev` | Production |
 
-> **Not created yet.** The Supabase free tier allows two active projects per owner and
-> both slots are in use (`hackathon-base-dev` and `rochbia-tracker`). Until a slot is
-> free, Production points at the dev project, which means a preview and production
-> share a database. Fix it before the event: pause a project you are not using, or
-> upgrade the organisation, then create `hackathon-base-prod` in `eu-central-1`,
-> run `pnpm db:push` against it, and repoint the Production variables below.
+> **Production and preview share a database.** The Supabase free tier allows two
+> active projects per owner and both slots are taken, one of them by an unrelated
+> project that matters more than this one. Nothing here is real user data, so the
+> risk is a demo trampling its own rows, not a leak.
+>
+> To split them later: free a slot or upgrade, create `hackathon-base-prod`, run
+> `pnpm db:push` against it, and repoint only the Production variables. Nothing in
+> the code assumes a single project.
 
-Set them per environment, not globally:
+Variables are already set per environment. `NEXT_PUBLIC_SITE_URL` is set for
+Production only, on purpose: Preview and Development derive the origin from the
+deployment URL, so a preview's confirmation email comes back to that preview
+rather than to production. See `src/lib/site-url.ts`.
 
 ```bash
-vercel env add NEXT_PUBLIC_SUPABASE_URL production      # prod project URL
-vercel env add NEXT_PUBLIC_SUPABASE_URL preview         # dev project URL
-vercel env add NEXT_PUBLIC_SUPABASE_URL development     # dev project URL
+vercel env ls                                  # see what is set where
+vercel env add NEXT_PUBLIC_SUPABASE_URL production
 ```
 
-Repeat for `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and
-`NEXT_PUBLIC_SITE_URL`. Check with `vercel env ls`. Migrations are applied to each
-project separately with `pnpm db:push`; there is no automatic promotion.
+Migrations are applied per project with `pnpm db:push`; there is no automatic
+promotion.
 
-In the Supabase dashboard, set **Authentication → URL Configuration → Site URL** and
-add the Vercel URLs to **Redirect URLs**, for both projects. Without this the emailed
-confirmation link comes back to `localhost`.
+### Still to do in the Supabase dashboard
+
+**Authentication → URL Configuration.** Set Site URL to the production URL and add
+these Redirect URLs. Until this is done, confirmation and reset emails point at
+`localhost:3000`.
+
+```
+https://hackathon-base-alons-projects-d6deeccc.vercel.app/**
+https://hackathon-base-*-alons-projects-d6deeccc.vercel.app/**
+http://localhost:3000/**
+```
+
+The wildcard entry is what makes preview deployments able to complete a signup.
 
 ## Secret scanning
 
-**Push protection runs locally.** `pnpm prepare` points git at `.githooks/`, and the
-`pre-push` hook runs `scripts/scan-secrets.ts` over every commit being pushed. It
-blocks Supabase secret keys and access tokens, service-role JWTs, Postgres URLs
-carrying a password, GitHub tokens, OpenAI and Anthropic keys, AWS key ids and
-private-key blocks. Verified by planting a fake AWS key and watching the push fail.
+The repository is **public**, so GitHub's secret scanning and push protection are
+enabled and free. A commit carrying a recognised credential is rejected at push
+time. `.env.local` has never been committed; the history was audited when the repo
+was made public.
 
-Run it by hand with `pnpm scan`.
+There is a second, local layer that does not depend on GitHub. `pnpm prepare`
+points git at `.githooks/`, and the `pre-push` hook runs `scripts/scan-secrets.ts`
+over the commits being pushed. It blocks Supabase secret keys and access tokens,
+service-role JWTs, Postgres URLs carrying a password, GitHub tokens, OpenAI and
+Anthropic keys, AWS key ids and private-key blocks. Verified by planting a fake AWS
+key and watching the push fail. Run it by hand with `pnpm scan`.
 
-GitHub's own secret scanning is **not enabled**, because it is unavailable on a free
-private repository — the API returns
-`422 Secret scanning is not available for this repository`. Two ways to get it:
+Dependabot alerts and automated security updates are on.
 
-- make the repository public (**Settings → General → Danger Zone**), which turns on
-  secret scanning and push protection for free; or
-- add GitHub Secret Protection to the account, then **Settings → Code security** →
-  enable *Secret scanning* and *Push protection*.
+If a push is blocked, by either layer, do not bypass it. Rotate the key in Supabase
+first, then rewrite the commit.
 
-Dependabot alerts and automated security updates **are** enabled.
-
-If a push is ever blocked, local or remote, do not bypass it. Rotate the key in
-Supabase first, then rewrite the commit.
+**The repo is public, so treat every file as published.** The publishable key in
+`.env.example` is safe by design. Nothing else belongs in a tracked file.
 
 ## Deploying
 
 ```bash
-vercel link
-# set the environment variables per environment, as above
 vercel deploy --prod
 ```
 
-The Content-Security-Policy ships **report-only**. Once the console is clean on every
-page, set `CSP_ENFORCE=true` in the Vercel Production environment and redeploy. See
-the tightening section in [`SECURITY.md`](SECURITY.md).
+Deployment protection is set to **previews only**: the production URL is public so
+it can be demoed, and preview deployments still require a Vercel login. Change it
+under Project Settings → Deployment Protection.
 
-For real rate limiting across serverless instances, set `UPSTASH_REDIS_REST_URL` and
-`UPSTASH_REDIS_REST_TOKEN`. Without them the limiter is per-process memory.
+Vercel is **not** connected to the GitHub repository, so pushes do not deploy on
+their own. Deploy with the CLI, or connect it under Project Settings → Git.
+
+The Content-Security-Policy ships **report-only**. Once the console is clean on
+every page, set `CSP_ENFORCE=true` in the Vercel Production environment and
+redeploy. See the tightening section in [`SECURITY.md`](SECURITY.md).
+
+For real rate limiting across serverless instances, set `UPSTASH_REDIS_REST_URL`
+and `UPSTASH_REDIS_REST_TOKEN`. Without them the limiter is per-process memory.

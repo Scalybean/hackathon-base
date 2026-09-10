@@ -142,3 +142,66 @@ prod Supabase project, GitHub repo with push protection, Vercel project and depl
   active projects and both slots are in use.
 - Vercel could not connect to the GitHub repository; its GitHub app needs access to
   the new private repo.
+
+---
+
+## 2026-09-10 (later) — same session — unblocking and deployment
+
+### Prompts
+
+> Done, made repo public instead of adding permissions
+
+> I didn't add another supabase active project because rochbia is too important,
+> more than this project
+
+### Actions
+
+1. **Audited the now-public repository.** `.env.local` was never committed and no
+   credential appears anywhere in history. The only pattern hits were the grep
+   string inside PROMPTS.md itself.
+2. **Enabled GitHub secret scanning and push protection**, which a public repo gets
+   for free and a free private repo cannot have. Dependabot was already on.
+3. **Accepted one Supabase project.** `rochbia-tracker` stays untouched. Production
+   and preview share `hackathon-base-dev`. Recorded in README and ARCHITECTURE as a
+   deliberate compromise with the three steps to undo it.
+4. **Deployed to production** and verified isolation against the live URL.
+5. **Set deployment protection to previews only**, so the production URL is publicly
+   reachable for a demo while preview builds still require a Vercel login.
+
+### Bugs found and fixed in this stretch
+
+- `SUPABASE_DB_URL` had been given the project URL rather than a Postgres
+  connection string, and `check:rls` reported an empty error. The script now
+  accepts `SUPABASE_ACCESS_TOKEN` + `SUPABASE_PROJECT_REF` through the Management
+  API as an alternative transport, so the database password is no longer required,
+  and it names the exact problem when the URL is the wrong shape.
+- `pnpm seed` could not construct a Supabase client on Node 20: supabase-js builds
+  a RealtimeClient eagerly and needs a global WebSocket. Added a stub transport in
+  `src/lib/supabase/no-realtime.ts`, used by both the seed script and the admin
+  client.
+- `pnpm seed` then failed with "permission denied for schema private": the trigger
+  functions on `profiles` run SECURITY INVOKER and `service_role` had no USAGE on
+  that schema. Fixed in a migration.
+- The Vercel build failed at `pnpm install` because `prepare` ran
+  `git config core.hooksPath` where there is no git directory. Replaced with
+  `scripts/install-hooks.mjs`, which exits quietly outside a checkout.
+- Auth emails would have pointed at a single hard-coded origin. `src/lib/site-url.ts`
+  now falls back to the deployment URL, so preview signups confirm against that
+  preview.
+
+### Verified on the live deployment
+
+Public routes 200, protected routes redirect with the path preserved, Alice and Bob
+see only their own notes, Bob gets 404 on Alice's note from both the page and the
+API, `/admin` is 404 for Bob and 200 for the admin, sign-out is POST-only, a forged
+confirmation token returns one generic failure, all security headers present, and
+the styleguide XSS payload renders with zero occurrences of `alert(1)`.
+
+### Still open
+
+- Supabase **Authentication → URL Configuration** needs the production and wildcard
+  preview redirect URLs, otherwise confirmation emails point at localhost.
+- `pnpm check:rls` still skips locally because neither `SUPABASE_ACCESS_TOKEN` nor a
+  valid `SUPABASE_DB_URL` is set. The same seven queries were run against the dev
+  database out of band and returned zero violations.
+- Vercel is not connected to the GitHub repository, so pushes do not deploy.
