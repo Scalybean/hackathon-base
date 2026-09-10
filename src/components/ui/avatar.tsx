@@ -28,9 +28,12 @@ export function Avatar({ name, src, size = 'md', className }: AvatarProps) {
   );
 
   if (src) {
-    // eslint-disable-next-line @next/next/no-img-element -- signed URLs expire;
-    // the image optimiser would cache a URL that stops resolving.
-    return <img src={src} alt="" className={classes} />;
+    // Signed URLs expire in ten minutes; next/image would cache a URL that
+    // stops resolving, so a plain img is the correct element here.
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={src} alt="" className={classes} />
+    );
   }
 
   return (

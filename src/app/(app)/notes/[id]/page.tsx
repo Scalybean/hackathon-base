@@ -25,20 +25,20 @@ export default async function NotePage(props: { params: Promise<{ id: string }> 
 
   const { user, supabase } = await requireUser();
 
-  try {
-    const note = await getNote(supabase, user.id, parsed.data);
-
-    return (
-      <>
-        <div className="mb-4">
-          <Breadcrumb items={[{ label: 'Notes', href: '/notes' }, { label: note.title }]} />
-        </div>
-        <PageHeader title={note.title} />
-        <NoteEditor note={note} />
-      </>
-    );
-  } catch (error) {
+  // Only the fetch is guarded. Constructing JSX inside a try/catch would not
+  // catch render errors anyway, and lint rightly refuses it.
+  const note = await getNote(supabase, user.id, parsed.data).catch((error: unknown) => {
     if (error instanceof ApiError && error.code === 'not_found') notFound();
     throw error;
-  }
+  });
+
+  return (
+    <>
+      <div className="mb-4">
+        <Breadcrumb items={[{ label: 'Notes', href: '/notes' }, { label: note.title }]} />
+      </div>
+      <PageHeader title={note.title} />
+      <NoteEditor note={note} />
+    </>
+  );
 }

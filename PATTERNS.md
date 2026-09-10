@@ -141,13 +141,15 @@ export default async function ThingPage(props: { params: Promise<{ id: string }>
   if (!parsed.success) notFound();
 
   const { user, supabase } = await requireUser();
-  try {
-    const thing = await getThing(supabase, user.id, parsed.data);
-    return <ThingEditor thing={thing} />;
-  } catch (error) {
+
+  // Guard the fetch, not the JSX. `react-hooks/error-boundaries` refuses JSX
+  // inside a try/catch, and it is right: a render error would not be caught.
+  const thing = await getThing(supabase, user.id, parsed.data).catch((error: unknown) => {
     if (error instanceof ApiError && error.code === 'not_found') notFound();
     throw error;
-  }
+  });
+
+  return <ThingEditor thing={thing} />;
 }
 ```
 

@@ -19,7 +19,7 @@ const STEPS: Step[] = [
     name: 'typecheck',
     command: 'tsc',
     args: ['--noEmit'],
-    fix: 'Column names come from src/types/database.ts — run `pnpm types` after a migration.',
+    fix: 'If a column name is wrong, run `pnpm types`. src/types/database.ts is the source of truth.',
   },
   {
     name: 'lint',
