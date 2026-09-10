@@ -22,6 +22,13 @@ const PATTERNS: { name: string; pattern: RegExp }[] = [
 /** Files where a fake or example value is expected. */
 const ALLOWED = [/^\.env\.example$/, /^scripts\/scan-secrets\.ts$/, /^SECURITY\.md$/, /^README\.md$/];
 
+/**
+ * Documentation shows the shape of a credential without being one. A match
+ * containing any of these is an example, not a leak. Kept deliberately narrow:
+ * a real key never contains angle brackets or the word "password".
+ */
+const PLACEHOLDER = /<|>|\[|\]|\.\.\.|PLACEHOLDER|EXAMPLE|example\.com|YOUR[-_]|:password@|:pass@/i;
+
 const range = process.argv[2] ?? 'HEAD';
 
 const diff = spawnSync('git', ['diff', '--no-color', '-U0', range], { encoding: 'utf8' });
@@ -44,7 +51,8 @@ for (const line of diff.stdout.split('\n')) {
   if (ALLOWED.some((allowed) => allowed.test(file))) continue;
 
   for (const { name, pattern } of PATTERNS) {
-    if (pattern.test(line)) findings.push({ file, name });
+    const match = pattern.exec(line);
+    if (match && !PLACEHOLDER.test(match[0])) findings.push({ file, name });
   }
 }
 
