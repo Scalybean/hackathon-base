@@ -36,3 +36,6 @@ yarn-error.log*
 
 # generated, but committed on purpose — do not ignore:
 #   REPOMAP.md, src/types/database.ts, pnpm-lock.yaml
+
+# The Vercel CLI appends ".env*" here on `vercel link`. Do not keep it: it
+# comes after "!.env.example" and would stop the template being tracked.
