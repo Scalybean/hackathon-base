@@ -45,26 +45,32 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const Component = asChild ? Slot : 'button';
+  const classes = cn(
+    'inline-flex items-center justify-center rounded-[var(--radius-md)] font-medium',
+    'transition-[background-color,color,box-shadow] duration-150',
+    'disabled:pointer-events-none disabled:opacity-45',
+    // Archivo's default figures are proportional; buttons with counts in them
+    // look wrong unless they are lining.
+    'font-sans tracking-[0.01em] [font-variant-numeric:lining-nums]',
+    VARIANTS[variant],
+    SIZES[size],
+    className,
+  );
+
+  // Slot requires exactly one element child, so the spinner cannot be rendered
+  // alongside it. asChild is for links, which never show a pending state.
+  if (asChild) {
+    return (
+      <Slot className={classes} {...props}>
+        {children}
+      </Slot>
+    );
+  }
 
   return (
-    <Component
-      className={cn(
-        'inline-flex items-center justify-center rounded-[var(--radius-md)] font-medium',
-        'transition-[background-color,color,box-shadow] duration-150',
-        'disabled:pointer-events-none disabled:opacity-45',
-        // Font feature: Archivo's default figures are proportional; buttons
-        // with counts look wrong unless they are lining.
-        'font-sans tracking-[0.01em] [font-variant-numeric:lining-nums]',
-        VARIANTS[variant],
-        SIZES[size],
-        className,
-      )}
-      disabled={disabled || loading}
-      {...props}
-    >
+    <button className={classes} disabled={disabled || loading} {...props}>
       {loading ? <Loader2 aria-hidden className="size-3.5 animate-spin" /> : null}
       {children}
-    </Component>
+    </button>
   );
 }
