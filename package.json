@@ -1,27 +1,59 @@
 {
-  "name": "hackathon",
+  "name": "hackathon-base",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check:rls": "tsx scripts/check-rls.ts",
+    "check:leak": "tsx scripts/check-service-role-leak.ts",
+    "verify": "tsx scripts/verify.ts",
+    "types": "tsx scripts/gen-types.ts",
+    "map": "tsx scripts/generate-repomap.ts",
+    "graph": "tsx scripts/generate-graph.ts",
+    "new:resource": "tsx scripts/new-resource.ts",
+    "seed": "tsx scripts/seed.ts",
+    "db:push": "supabase db push",
+    "db:diff": "supabase db diff"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "1.1.23",
+    "@radix-ui/react-dropdown-menu": "2.1.24",
+    "@radix-ui/react-label": "2.1.15",
+    "@radix-ui/react-slot": "1.3.3",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.116.0",
+    "clsx": "2.1.1",
+    "isomorphic-dompurify": "4.2.0",
+    "lucide-react": "1.44.0",
     "next": "16.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "0.0.1",
+    "sonner": "2.0.8",
+    "tailwind-merge": "3.6.0",
+    "zod": "4.6.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "madge": "8.0.0",
+    "pg": "8.23.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "4.23.13",
+    "typescript": "^5",
+    "vitest": "5.0.0"
   },
-  "packageManager": "pnpm@12.3.4"
+  "packageManager": "pnpm@10.34.5"
 }
