@@ -93,6 +93,13 @@ Previews must never touch production data.
 | preview branches | `hackathon-base-dev` | Preview + Development |
 | production | `hackathon-base-prod` | Production |
 
+> **Not created yet.** The Supabase free tier allows two active projects per owner and
+> both slots are in use (`hackathon-base-dev` and `rochbia-tracker`). Until a slot is
+> free, Production points at the dev project, which means a preview and production
+> share a database. Fix it before the event: pause a project you are not using, or
+> upgrade the organisation, then create `hackathon-base-prod` in `eu-central-1`,
+> run `pnpm db:push` against it, and repoint the Production variables below.
+
 Set them per environment, not globally:
 
 ```bash
@@ -111,13 +118,27 @@ confirmation link comes back to `localhost`.
 
 ## Secret scanning
 
-Push protection and secret scanning are enabled on the GitHub repository, so a
-committed key is rejected at push time rather than found later. To confirm or
-re-enable: **Settings → Code security → Secret protection**, then turn on *Secret
-scanning* and *Push protection*.
+**Push protection runs locally.** `pnpm prepare` points git at `.githooks/`, and the
+`pre-push` hook runs `scripts/scan-secrets.ts` over every commit being pushed. It
+blocks Supabase secret keys and access tokens, service-role JWTs, Postgres URLs
+carrying a password, GitHub tokens, OpenAI and Anthropic keys, AWS key ids and
+private-key blocks. Verified by planting a fake AWS key and watching the push fail.
 
-If a push is ever blocked, do not bypass it. Rotate the key in Supabase first, then
-rewrite the commit.
+Run it by hand with `pnpm scan`.
+
+GitHub's own secret scanning is **not enabled**, because it is unavailable on a free
+private repository — the API returns
+`422 Secret scanning is not available for this repository`. Two ways to get it:
+
+- make the repository public (**Settings → General → Danger Zone**), which turns on
+  secret scanning and push protection for free; or
+- add GitHub Secret Protection to the account, then **Settings → Code security** →
+  enable *Secret scanning* and *Push protection*.
+
+Dependabot alerts and automated security updates **are** enabled.
+
+If a push is ever blocked, local or remote, do not bypass it. Rotate the key in
+Supabase first, then rewrite the commit.
 
 ## Deploying
 

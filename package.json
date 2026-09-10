@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -19,7 +20,8 @@
     "new:resource": "tsx scripts/new-resource.ts",
     "seed": "tsx scripts/seed.ts",
     "db:push": "supabase db push",
-    "db:diff": "supabase db diff"
+    "db:diff": "supabase db diff",
+    "scan": "tsx scripts/scan-secrets.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.1.23",

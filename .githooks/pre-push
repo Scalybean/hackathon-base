@@ -1,0 +1,13 @@
+#!/bin/sh
+# Local push protection. See scripts/scan-secrets.ts.
+# Installed by `pnpm prepare`, which sets core.hooksPath to this directory.
+
+remote_ref=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null)
+
+if [ -n "$remote_ref" ]; then
+  range="$remote_ref..HEAD"
+else
+  range="HEAD"
+fi
+
+exec pnpm exec tsx scripts/scan-secrets.ts "$range"
