@@ -1,0 +1,35 @@
+/**
+ * Single __entity__ endpoint. Ownership is re-checked in the query helper on
+ * every verb, so a guessed id is a 404 rather than someone else's row.
+ */
+import { z } from 'zod';
+
+import { notFoundError } from '@/lib/api/errors';
+import { route } from '@/lib/api/handler';
+import { delete__Entity__, get__Entity__, update__Entity__ } from '@/lib/db/__table__';
+import { __entity__IdSchema, update__Entity__Schema } from '@/lib/schemas/__table__';
+
+const paramsSchema = z.object({ id: __entity__IdSchema });
+
+/** A malformed id is "not found", never a validation error that echoes input. */
+function __entity__Id(params: Record<string, string>): string {
+  const parsed = paramsSchema.safeParse(params);
+  if (!parsed.success) throw notFoundError();
+  return parsed.data.id;
+}
+
+export const GET = route({ rateLimit: 'read' }, async ({ supabase, user, params }) =>
+  get__Entity__(supabase, user.id, __entity__Id(params)),
+);
+
+export const PATCH = route(
+  { rateLimit: 'mutation', body: update__Entity__Schema },
+  async ({ supabase, user, params, body }) =>
+    update__Entity__(supabase, user.id, __entity__Id(params), body),
+);
+
+export const DELETE = route({ rateLimit: 'mutation' }, async ({ supabase, user, params }) => {
+  const id = __entity__Id(params);
+  await delete__Entity__(supabase, user.id, id);
+  return { id };
+});

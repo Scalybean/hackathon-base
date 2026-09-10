@@ -1,26 +1,98 @@
-@import "tailwindcss";
+/**
+ * Global stylesheet. Tailwind, then the tokens, then a thin base layer.
+ * Component styling belongs in the component; nothing product-specific here.
+ */
+@import 'tailwindcss';
+@import '../styles/tokens.css';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  [data-theme='dark'] {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    /* Archivo has a large x-height; a touch of tracking keeps it from looking
+       cramped at body size. */
+    letter-spacing: 0.005em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    /* Fraunces variable axes: slightly lower optical size and a little wonk
+       give headings a printed-page character instead of a web-default one. */
+    font-variation-settings: 'SOFT' 0, 'WONK' 1, 'opsz' 30;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+    font-size: 0.925em;
+    font-feature-settings: 'zero' 1;
+  }
+
+  /* Tabular figures everywhere numbers are compared down a column. */
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: var(--accent-soft);
+    color: var(--accent-soft-fg);
+  }
+
+  /* One focus treatment for the whole app. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::placeholder {
+    color: var(--fg-subtle);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* The one decorative flourish in the system: a thin clay rule used to mark
+     section starts. Referenced by PageHeader and the marketing page. */
+  .rule-accent {
+    background-image: linear-gradient(90deg, var(--accent) 0 2.5rem, var(--border) 2.5rem 100%);
+    block-size: 2px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
 }

@@ -1,0 +1,28 @@
+/**
+ * Zod schemas for the __table__ resource. Note what is absent: there is no
+ * user_id field. Ownership never travels in a request body.
+ */
+import { z } from 'zod';
+
+export const __entity__TitleSchema = z
+  .string()
+  .trim()
+  .min(1, 'Enter a title.')
+  .max(200, 'Use at most 200 characters.');
+
+export const __entity__BodySchema = z.string().trim().max(10_000, 'Use at most 10,000 characters.');
+
+export const create__Entity__Schema = z.object({
+  title: __entity__TitleSchema,
+  body: __entity__BodySchema.default(''),
+});
+
+export const update__Entity__Schema = z.object({
+  title: __entity__TitleSchema,
+  body: __entity__BodySchema,
+});
+
+export const __entity__IdSchema = z.uuid('Not found.');
+
+export type Create__Entity__Input = z.infer<typeof create__Entity__Schema>;
+export type Update__Entity__Input = z.infer<typeof update__Entity__Schema>;

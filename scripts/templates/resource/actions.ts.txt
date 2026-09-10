@@ -1,0 +1,46 @@
+/**
+ * __table__ mutations. Each one is action(...), which handles rate limit, auth
+ * and Zod; the query helper re-checks ownership.
+ */
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+import { action } from '@/lib/api/action';
+import { create__Entity__, delete__Entity__, update__Entity__ } from '@/lib/db/__table__';
+import {
+  create__Entity__Schema,
+  __entity__IdSchema,
+  update__Entity__Schema,
+} from '@/lib/schemas/__table__';
+
+export const create__Entity__Action = action(
+  { rateLimit: 'mutation', input: create__Entity__Schema },
+  async ({ input, supabase }) => {
+    const row = await create__Entity__(supabase, input);
+    revalidatePath('/__table__');
+    return row;
+  },
+);
+
+export const update__Entity__Action = action(
+  { rateLimit: 'mutation', input: update__Entity__Schema.extend({ id: __entity__IdSchema }) },
+  async ({ input, supabase, user }) => {
+    const row = await update__Entity__(supabase, user.id, input.id, {
+      title: input.title,
+      body: input.body,
+    });
+    revalidatePath('/__table__');
+    return row;
+  },
+);
+
+export const delete__Entity__Action = action(
+  { rateLimit: 'mutation', input: z.object({ id: __entity__IdSchema }) },
+  async ({ input, supabase, user }) => {
+    await delete__Entity__(supabase, user.id, input.id);
+    revalidatePath('/__table__');
+    return { id: input.id };
+  },
+);

@@ -1,0 +1,288 @@
+/**
+ * Design tokens. Every colour, space, radius, shadow and type size in the app
+ * resolves to something declared here. Components reference tokens; nothing
+ * downstream writes a raw hex value or a pixel size.
+ *
+ * Direction: warm clay + ink. Editorial, grounded, precise.
+ */
+
+/*
+ * The theme is resolved server-side from a cookie, so there is no flash and no
+ * inline script to whitelist in the CSP. Components never write `dark:`
+ * utilities — they use the semantic roles below, which flip on their own.
+ */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+  /* ---------------------------------------------------------------------
+   * Palette. Two ramps only: clay (the accent) and stone (the neutral).
+   * Stone is warm on purpose — a cool grey next to clay reads as an error.
+   * ------------------------------------------------------------------ */
+  --clay-50: #fdf3ef;
+  --clay-100: #f9e3da;
+  --clay-200: #f2c6b4;
+  --clay-300: #e8a186;
+  --clay-400: #db7350;
+  --clay-500: #b4451f;
+  --clay-600: #9a3818;
+  --clay-700: #7c2c13;
+  --clay-800: #5e210f;
+  --clay-900: #40170b;
+
+  --stone-0: #ffffff;
+  --stone-25: #fdfbf8;
+  --stone-50: #faf7f2;
+  --stone-100: #f2ede4;
+  --stone-200: #e4ded2;
+  --stone-300: #d1c7b7;
+  --stone-400: #a79b88;
+  --stone-500: #7c7162;
+  --stone-600: #5b5247;
+  --stone-700: #423b33;
+  --stone-800: #2a2521;
+  --stone-900: #1a1714;
+  --stone-950: #100e0c;
+
+  /* Status hues, desaturated to sit beside clay without shouting. */
+  --moss-100: #e3ebe2;
+  --moss-500: #3f6b4a;
+  --moss-700: #2c4c34;
+  --amber-100: #f7ecd6;
+  --amber-500: #a97a24;
+  --amber-700: #7a5717;
+  --rust-100: #f7e0dd;
+  --rust-500: #a32b22;
+  --rust-700: #761d17;
+  --slate-100: #dfe7ec;
+  --slate-500: #3a5a73;
+  --slate-700: #294152;
+
+  /* ---------------------------------------------------------------------
+   * Semantic roles. These are what components use. Swapping the theme means
+   * redefining this block and nothing else.
+   * ------------------------------------------------------------------ */
+  --bg: var(--stone-50);
+  --bg-raised: var(--stone-0);
+  --bg-sunken: var(--stone-100);
+  --bg-inset: var(--stone-25);
+  --bg-hover: var(--stone-100);
+  --bg-active: var(--stone-200);
+
+  --fg: var(--stone-900);
+  --fg-muted: var(--stone-600);
+  --fg-subtle: var(--stone-500);
+  --fg-on-accent: var(--stone-25);
+
+  --border: var(--stone-200);
+  --border-strong: var(--stone-300);
+  --border-accent: var(--clay-500);
+
+  --accent: var(--clay-500);
+  --accent-hover: var(--clay-600);
+  --accent-active: var(--clay-700);
+  --accent-soft: var(--clay-50);
+  --accent-soft-fg: var(--clay-700);
+
+  --success: var(--moss-500);
+  --success-soft: var(--moss-100);
+  --success-fg: var(--moss-700);
+  --warning: var(--amber-500);
+  --warning-soft: var(--amber-100);
+  --warning-fg: var(--amber-700);
+  --danger: var(--rust-500);
+  --danger-soft: var(--rust-100);
+  --danger-fg: var(--rust-700);
+  --info: var(--slate-500);
+  --info-soft: var(--slate-100);
+  --info-fg: var(--slate-700);
+
+  --ring: var(--clay-500);
+
+  /* ---------------------------------------------------------------------
+   * Radius. Restrained: editorial layouts lose their edge when everything
+   * is a pill. Only Badge and Avatar go fully round.
+   * ------------------------------------------------------------------ */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 8px;
+  --radius-xl: 14px;
+  --radius-full: 999px;
+
+  /* ---------------------------------------------------------------------
+   * Shadows. Warm-tinted and shallow. There is no "shadow on everything"
+   * level here on purpose; elevation is carried by borders and background.
+   * ------------------------------------------------------------------ */
+  --shadow-xs: 0 1px 1px rgb(26 23 20 / 0.04);
+  --shadow-sm: 0 1px 2px rgb(26 23 20 / 0.06), 0 1px 1px rgb(26 23 20 / 0.04);
+  --shadow-md: 0 4px 10px -3px rgb(26 23 20 / 0.1), 0 1px 2px rgb(26 23 20 / 0.05);
+  --shadow-lg: 0 16px 40px -12px rgb(26 23 20 / 0.2);
+  --shadow-focus: 0 0 0 3px rgb(180 69 31 / 0.22);
+
+  /* ---------------------------------------------------------------------
+   * Type scale. Body sits at 15px, not 16px: it makes dense tables and
+   * sidebars readable without shrinking anything ad hoc later.
+   * ------------------------------------------------------------------ */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.9375rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.6rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 1.95rem;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 2.35rem;
+  --text-4xl: 2.75rem;
+  --text-4xl--line-height: 3rem;
+  --text-5xl: 3.5rem;
+  --text-5xl--line-height: 3.6rem;
+
+  /* Layout constants used by the app shell. */
+  --sidebar-width: 15rem;
+  --topbar-height: 3.5rem;
+  --content-max: 78rem;
+}
+
+/* -------------------------------------------------------------------------
+ * Dark mode. Only the semantic roles are redefined — never a component, never
+ * a ramp. Three states: an explicit choice stamps data-theme on <html>; with
+ * no choice the OS preference decides. The two blocks below are deliberately
+ * identical; keep them in sync.
+ * ---------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+  --bg: var(--stone-950);
+  --bg-raised: var(--stone-900);
+  --bg-sunken: #0a0908;
+  --bg-inset: var(--stone-800);
+  --bg-hover: var(--stone-800);
+  --bg-active: var(--stone-700);
+
+  --fg: var(--stone-100);
+  --fg-muted: var(--stone-400);
+  --fg-subtle: var(--stone-500);
+  --fg-on-accent: #fffaf7;
+
+  --border: #322c26;
+  --border-strong: var(--stone-700);
+  --border-accent: var(--clay-400);
+
+  --accent: var(--clay-400);
+  --accent-hover: #e78967;
+  --accent-active: var(--clay-300);
+  --accent-soft: #2e1a11;
+  --accent-soft-fg: var(--clay-300);
+
+  --success-soft: #1b2a1e;
+  --success-fg: #8fbb99;
+  --warning-soft: #2d2313;
+  --warning-fg: #d9b071;
+  --danger-soft: #2e1512;
+  --danger-fg: #e39189;
+  --info-soft: #16232c;
+  --info-fg: #8fb2c9;
+
+  --ring: var(--clay-400);
+
+  --shadow-xs: 0 1px 1px rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 12px -3px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 16px 44px -12px rgb(0 0 0 / 0.7);
+  --shadow-focus: 0 0 0 3px rgb(219 115 80 / 0.3);
+  }
+}
+
+[data-theme='dark'] {
+  --bg: var(--stone-950);
+  --bg-raised: var(--stone-900);
+  --bg-sunken: #0a0908;
+  --bg-inset: var(--stone-800);
+  --bg-hover: var(--stone-800);
+  --bg-active: var(--stone-700);
+
+  --fg: var(--stone-100);
+  --fg-muted: var(--stone-400);
+  --fg-subtle: var(--stone-500);
+  --fg-on-accent: #fffaf7;
+
+  --border: #322c26;
+  --border-strong: var(--stone-700);
+  --border-accent: var(--clay-400);
+
+  --accent: var(--clay-400);
+  --accent-hover: #e78967;
+  --accent-active: var(--clay-300);
+  --accent-soft: #2e1a11;
+  --accent-soft-fg: var(--clay-300);
+
+  --success-soft: #1b2a1e;
+  --success-fg: #8fbb99;
+  --warning-soft: #2d2313;
+  --warning-fg: #d9b071;
+  --danger-soft: #2e1512;
+  --danger-fg: #e39189;
+  --info-soft: #16232c;
+  --info-fg: #8fb2c9;
+
+  --ring: var(--clay-400);
+
+  --shadow-xs: 0 1px 1px rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 12px -3px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 16px 44px -12px rgb(0 0 0 / 0.7);
+  --shadow-focus: 0 0 0 3px rgb(219 115 80 / 0.3);
+}
+
+/* -------------------------------------------------------------------------
+ * Expose the semantic roles to Tailwind so `bg-bg-raised`, `text-fg-muted`,
+ * `border-border` and friends exist as utilities.
+ * ---------------------------------------------------------------------- */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-bg-inset: var(--bg-inset);
+  --color-bg-hover: var(--bg-hover);
+  --color-bg-active: var(--bg-active);
+
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-fg-on-accent: var(--fg-on-accent);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-accent: var(--border-accent);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-active: var(--accent-active);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-fg: var(--accent-soft-fg);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-fg: var(--success-fg);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-fg: var(--warning-fg);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-fg: var(--danger-fg);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-fg: var(--info-fg);
+
+  --color-ring: var(--ring);
+
+  --font-display: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, 'SF Mono', monospace;
+}

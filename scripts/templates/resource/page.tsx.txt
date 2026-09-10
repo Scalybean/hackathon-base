@@ -1,0 +1,57 @@
+/** __Title__ list. Protected: it lives under (app), which is behind requireUser(). */
+import { FileText } from 'lucide-react';
+
+import { PageHeader } from '@/components/app/page-header';
+import { EmptyState } from '@/components/ui/empty-state';
+import { TBody, TD, TH, THead, TR, Table } from '@/components/ui/table';
+import { requireUser } from '@/lib/auth/require-user';
+import { list__Entities__ } from '@/lib/db/__table__';
+
+import { __Entity__Composer } from './__entity__-composer';
+
+export const metadata = { title: '__Title__' };
+
+export default async function __Entities__Page() {
+  const { user, supabase } = await requireUser();
+  const rows = await list__Entities__(supabase, user.id);
+
+  return (
+    <>
+      <PageHeader title="__Title__" description="Owned rows. Other users cannot see any of these." />
+
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+        <div>
+          {rows.length === 0 ? (
+            <EmptyState icon={FileText} title="Nothing here yet" description="Create one on the right." />
+          ) : (
+            <div className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-bg-raised">
+              <Table>
+                <THead>
+                  <TR>
+                    <TH>Title</TH>
+                    <TH>Updated</TH>
+                  </TR>
+                </THead>
+                <TBody>
+                  {rows.map((row) => (
+                    <TR key={row.id}>
+                      <TD className="font-medium">{row.title}</TD>
+                      <TD className="text-fg-muted">
+                        {new Date(row.updated_at).toLocaleDateString(undefined, {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
+                      </TD>
+                    </TR>
+                  ))}
+                </TBody>
+              </Table>
+            </div>
+          )}
+        </div>
+
+        <__Entity__Composer />
+      </div>
+    </>
+  );
+}

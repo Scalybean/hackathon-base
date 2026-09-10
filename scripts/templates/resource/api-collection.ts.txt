@@ -1,0 +1,18 @@
+/**
+ * __table__ collection endpoint. Every export is route(...), which enforces
+ * rate limit, auth and Zod before the handler body runs.
+ */
+import { route } from '@/lib/api/handler';
+import { create__Entity__, list__Entities__ } from '@/lib/db/__table__';
+import { create__Entity__Schema } from '@/lib/schemas/__table__';
+
+export const GET = route({ rateLimit: 'read' }, async ({ supabase, user }) =>
+  list__Entities__(supabase, user.id),
+);
+
+export const POST = route(
+  { rateLimit: 'mutation', body: create__Entity__Schema },
+  async ({ supabase, body }) => create__Entity__(supabase, body),
+);
+
+export const dynamic = 'force-dynamic';

@@ -10,10 +10,15 @@ export const passwordSchema = z
   .min(10, 'Use at least 10 characters.')
   .max(128, 'Use at most 128 characters.');
 
+/**
+ * Trim and case-fold BEFORE validating. Doing it the other way round rejects a
+ * pasted address with a trailing space and blames the user for it.
+ */
 export const emailSchema = z
-  .email('Enter a valid email address.')
-  .max(254)
-  .transform((value) => value.trim().toLowerCase());
+  .string()
+  .trim()
+  .toLowerCase()
+  .pipe(z.email('Enter a valid email address.').max(254));
 
 export const displayNameSchema = z
   .string()

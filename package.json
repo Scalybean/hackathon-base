@@ -29,7 +29,6 @@
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.116.0",
     "clsx": "2.1.1",
-    "isomorphic-dompurify": "4.2.0",
     "lucide-react": "1.44.0",
     "next": "16.3.4",
     "react": "19.2.8",
@@ -37,6 +36,7 @@
     "server-only": "0.0.1",
     "sonner": "2.0.8",
     "tailwind-merge": "3.6.0",
+    "xss": "1.0.15",
     "zod": "4.6.1"
   },
   "devDependencies": {
@@ -55,5 +55,8 @@
     "typescript": "^5",
     "vitest": "5.0.0"
   },
-  "packageManager": "pnpm@10.34.5"
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=20.9.0"
+  }
 }

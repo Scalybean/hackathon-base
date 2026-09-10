@@ -98,7 +98,9 @@ export function action<TInput extends z.ZodType, TResult>(
 function formDataToObject(formData: FormData): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [key, value] of formData.entries()) {
-    if (value instanceof File) continue;
+    // An empty file input still submits a zero-byte File. Drop it so the
+    // schema sees "absent" rather than "an invalid file".
+    if (value instanceof File && value.size === 0 && value.name === '') continue;
     out[key] = value;
   }
   return out;

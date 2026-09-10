@@ -1,69 +1,87 @@
-import Image from "next/image";
+/** Public landing page. No session required and nothing personal on it. */
+import Link from 'next/link';
+import { ArrowRight, Database, KeyRound, ShieldCheck } from 'lucide-react';
 
-export default function Home() {
+import { Button } from '@/components/ui/button';
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-dvh">
+      <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
+        <span className="flex items-baseline gap-2">
+          <span className="font-display text-xl font-semibold tracking-tight">Base</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+        </span>
+        <nav className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/styleguide">Styleguide</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/login">Sign in</Link>
+          </Button>
+        </nav>
+      </header>
+
+      <main className="mx-auto max-w-5xl px-6 pb-24 pt-16">
+        <div className="rule-accent mb-10 w-40" />
+        <h1 className="max-w-3xl font-display text-5xl leading-[1.03] tracking-[-0.025em]">
+          The boring, dangerous parts.
+          <br />
+          <span className="text-accent">Already finished.</span>
+        </h1>
+        <p className="mt-7 max-w-xl text-lg leading-relaxed text-fg-muted">
+          Auth, row-level security, rate limiting, a private storage bucket and a design system
+          that does not look generated. Build the product on top.
+        </p>
+
+        <div className="mt-9 flex flex-wrap gap-3">
+          <Button asChild size="lg">
+            <Link href="/signup">
+              Create an account
+              <ArrowRight aria-hidden className="size-4" strokeWidth={2} />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="secondary">
+            <Link href="/login">Sign in</Link>
+          </Button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        <dl className="mt-24 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-border bg-border sm:grid-cols-3">
+          <Feature
+            icon={ShieldCheck}
+            term="Default deny"
+            detail="Every table has RLS forced on, with one policy per operation and ownership derived from auth.uid()."
+          />
+          <Feature
+            icon={KeyRound}
+            term="No leaked keys"
+            detail="The service-role key is server-only, and the build fails if it ever reaches a client chunk."
+          />
+          <Feature
+            icon={Database}
+            term="One command"
+            detail="pnpm verify runs typecheck, lint, tests, the RLS audit, the build and the leak scan."
+          />
+        </dl>
       </main>
+    </div>
+  );
+}
+
+function Feature({
+  icon: Icon,
+  term,
+  detail,
+}: {
+  icon: typeof ShieldCheck;
+  term: string;
+  detail: string;
+}) {
+  return (
+    <div className="bg-bg-raised px-6 py-7">
+      <Icon aria-hidden className="size-4 text-accent" strokeWidth={1.75} />
+      <dt className="mt-3 font-medium">{term}</dt>
+      <dd className="mt-1.5 text-sm leading-relaxed text-fg-muted">{detail}</dd>
     </div>
   );
 }

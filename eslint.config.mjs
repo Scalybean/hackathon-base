@@ -49,13 +49,19 @@ const eslintConfig = defineConfig([
               message: "Deprecated. Use @supabase/ssr via @/lib/supabase/*.",
             },
             {
-              name: "dompurify",
+              name: "xss",
               message: "Import sanitizeHtml from @/lib/sanitize instead.",
             },
           ],
         },
       ],
     },
+  },
+  {
+    // The one file allowed to import the sanitiser library directly.
+    name: "hackathon-base/sanitizer",
+    files: ["src/lib/sanitize.ts"],
+    rules: { "no-restricted-imports": "off" },
   },
   {
     // The one file allowed to render HTML. It only ever receives sanitised input.
@@ -65,7 +71,7 @@ const eslintConfig = defineConfig([
   },
   {
     name: "hackathon-base/scripts",
-    files: ["scripts/**/*.ts", "vitest.config.ts", "*.config.*"],
+    files: ["scripts/**/*.ts", "vitest.config.mts", "*.config.*"],
     rules: { "no-console": "off" },
   },
 ]);
