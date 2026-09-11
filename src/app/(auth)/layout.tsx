@@ -16,14 +16,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="max-w-md">
           <div className="rule-accent mb-8 w-32" />
           <p className="font-display text-4xl leading-[1.08] tracking-[-0.02em]">
-            Ship the product.
+            A quieter place
             <br />
-            The plumbing is
-            <span className="text-accent"> already done</span>.
+            <span className="text-accent">to write</span>.
           </p>
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-fg-muted">
-            Row-level security on every table, a single authenticated entry point for
-            server code, and rate limits on everything that writes.
+            Notes that stay out of your way, on every device you use.
           </p>
         </div>
 

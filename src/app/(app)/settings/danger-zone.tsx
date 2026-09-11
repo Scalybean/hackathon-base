@@ -33,7 +33,7 @@ export function DangerZone() {
           <DialogHeader>
             <DialogTitle>Delete your account</DialogTitle>
             <DialogDescription>
-              Your login, profile, uploads and every row you own are removed immediately.
+              Your account, your notes and your uploads are removed immediately.
             </DialogDescription>
           </DialogHeader>
 

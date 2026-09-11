@@ -243,3 +243,48 @@ service worker cache, and pinning a stale worker. A thirteenth hard rule in
 CLAUDE.md: the worker caches build artefacts only.
 
 Registration is production-only, so `pnpm dev` never serves a stale chunk.
+
+---
+
+## 2026-09-11 (later) — same session — remove security copy from the UI
+
+### Prompt
+
+> Remove all the text in the app that brags about the security of it. It's a
+> feature that's invisible to the user
+
+### Actions
+
+Rewrote every user-facing string that described the defences. Besides being
+noise to a user, advertising the controls hands a red team a free map.
+
+- Landing page: hero and the three feature cards no longer describe RLS, the
+  service-role key or `pnpm verify`. They describe the product and the new
+  install-to-home-screen behaviour instead.
+- Auth shell: the left panel no longer lists the security properties.
+- Dashboard: dropped the row-level-security description, the "RLS enforced"
+  badge, the "Visible to others" stat and both developer callouts. Stats are
+  now Notes, Words and Last written.
+- Notes, Admin, Settings: descriptions rewritten without ownership, signed-URL
+  or 404-versus-403 language.
+- Signup confirmation no longer says the link is single-use.
+- The admin empty state no longer tells the viewer to run `pnpm seed`.
+- The app description in the metadata and the web manifest no longer says
+  "secure".
+
+Code comments and the repo documentation are untouched: their audience is the
+developer, and they are where the reasoning belongs.
+
+### Bug found
+
+`react-hooks/purity` refused a `Date.now()` call in the dashboard render, which
+was there to compute a "this week" count. It is right: a clock read during
+render is non-deterministic. Replaced with a word count derived from the data.
+
+### Left alone, deliberately
+
+- `/styleguide` still describes what each primitive does, including that
+  SafeHtml sanitises. Its audience is developers, and removing that would
+  invite misuse. It is, however, linked from the public landing page.
+- The seeded note bodies still read "Bob must never see this", because the
+  ten-second isolation check in the README depends on them being identifiable.

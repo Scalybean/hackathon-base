@@ -13,7 +13,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: { default: 'hackathon-base', template: '%s · hackathon-base' },
-  description: 'A secure Next.js and Supabase base template.',
+  description: 'Notes that stay out of your way.',
   // No indexing until there is a product here.
   robots: { index: false, follow: false },
   applicationName: 'Base',

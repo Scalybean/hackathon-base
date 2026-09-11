@@ -19,7 +19,7 @@ export default async function NotesPage() {
     <>
       <PageHeader
         title="Notes"
-        description="Owned rows. Another signed-in user cannot read, edit or delete any of these, and the database is what stops them."
+        description="Everything you have written, newest first."
       />
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
@@ -28,7 +28,7 @@ export default async function NotesPage() {
             <EmptyState
               icon={FileText}
               title="Nothing here yet"
-              description="Write one on the right. Then sign in as another seeded user and confirm this list stays empty for them."
+              description="Write your first one on the right."
             />
           ) : (
             <NoteList notes={notes} />

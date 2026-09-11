@@ -38,10 +38,7 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Avatar</CardTitle>
-            <CardDescription>
-              Stored in a private bucket. Displayed through a signed URL that expires in ten
-              minutes.
-            </CardDescription>
+            <CardDescription>Shown next to your name.</CardDescription>
           </CardHeader>
           <CardBody>
             <AvatarForm displayName={profile.display_name} avatarUrl={avatarUrl} />
@@ -52,8 +49,7 @@ export default async function SettingsPage() {
           <CardHeader className="border-danger-soft">
             <CardTitle className="text-danger-fg">Delete account</CardTitle>
             <CardDescription>
-              Removes your login, your profile and every row you own. There is no undo and no
-              export.
+              Removes your account and everything in it. There is no undo.
             </CardDescription>
           </CardHeader>
           <CardBody>

@@ -29,7 +29,7 @@ export default async function AdminPage() {
     <>
       <PageHeader
         title="Admin"
-        description="Every account. A non-admin who guesses this URL gets a 404, not a 403 — the surface is not advertised."
+        description="Everyone with an account."
       />
 
       <Card>
@@ -40,7 +40,7 @@ export default async function AdminPage() {
         <CardBody className="p-0">
           {rows.length === 0 ? (
             <div className="p-5">
-              <EmptyState icon={Users} title="No accounts" description="Run pnpm seed." />
+              <EmptyState icon={Users} title="No accounts yet" />
             </div>
           ) : (
             <Table>

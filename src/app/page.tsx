@@ -1,6 +1,6 @@
 /** Public landing page. No session required and nothing personal on it. */
 import Link from 'next/link';
-import { ArrowRight, Database, KeyRound, ShieldCheck } from 'lucide-react';
+import { ArrowRight, History, PenLine, Smartphone } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -25,13 +25,12 @@ export default function HomePage() {
       <main className="mx-auto max-w-5xl px-6 pb-24 pt-16">
         <div className="rule-accent mb-10 w-40" />
         <h1 className="max-w-3xl font-display text-5xl leading-[1.03] tracking-[-0.025em]">
-          The boring, dangerous parts.
+          A quieter place
           <br />
-          <span className="text-accent">Already finished.</span>
+          <span className="text-accent">to write.</span>
         </h1>
         <p className="mt-7 max-w-xl text-lg leading-relaxed text-fg-muted">
-          Auth, row-level security, rate limiting, a private storage bucket and a design system
-          that does not look generated. Build the product on top.
+          Notes that stay out of your way. Start one in a second, find it again in less.
         </p>
 
         <div className="mt-9 flex flex-wrap gap-3">
@@ -48,19 +47,19 @@ export default function HomePage() {
 
         <dl className="mt-24 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-border bg-border sm:grid-cols-3">
           <Feature
-            icon={ShieldCheck}
-            term="Default deny"
-            detail="Every table has RLS forced on, with one policy per operation and ownership derived from auth.uid()."
+            icon={PenLine}
+            term="Start writing"
+            detail="No folders to set up and no template to choose. Open a note and go."
           />
           <Feature
-            icon={KeyRound}
-            term="No leaked keys"
-            detail="The service-role key is server-only, and the build fails if it ever reaches a client chunk."
+            icon={Smartphone}
+            term="Install it"
+            detail="Add it to your home screen and it opens like any other app."
           />
           <Feature
-            icon={Database}
-            term="One command"
-            detail="pnpm verify runs typecheck, lint, tests, the RLS audit, the build and the leak scan."
+            icon={History}
+            term="Pick up where you left off"
+            detail="Your notes are waiting on whichever device you open next."
           />
         </dl>
       </main>
@@ -73,7 +72,7 @@ function Feature({
   term,
   detail,
 }: {
-  icon: typeof ShieldCheck;
+  icon: typeof PenLine;
   term: string;
   detail: string;
 }) {

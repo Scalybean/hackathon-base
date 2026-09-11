@@ -20,9 +20,9 @@ export function SignupForm() {
         <MailCheck aria-hidden className="size-5 text-accent" strokeWidth={1.5} />
         <p className="mt-3 font-display text-lg font-semibold">Check your inbox</p>
         <p className="mt-1.5 text-sm leading-relaxed text-fg-muted">
-          If that address can be registered, a confirmation link is on its way to{' '}
-          <span className="font-medium text-fg">{state.data.email}</span>. The link is
-          single-use and expires in an hour.
+          A confirmation link is on its way to{' '}
+          <span className="font-medium text-fg">{state.data.email}</span>. It expires in an
+          hour.
         </p>
       </div>
     );

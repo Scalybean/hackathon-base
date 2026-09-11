@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'hackathon-base',
     short_name: 'Base',
-    description: 'A secure Next.js and Supabase base template.',
+    description: 'Notes that stay out of your way.',
     // Installed users land in the app, not on the marketing page. Signed-out
     // users are redirected to /login from there by proxy.ts.
     start_url: '/dashboard',

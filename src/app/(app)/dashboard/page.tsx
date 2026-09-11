@@ -1,6 +1,6 @@
 /** Dashboard. Exercises most of the primitive set against real, owned data. */
 import Link from 'next/link';
-import { FileText, Plus, ShieldCheck, Sparkles } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 
 import { PageHeader } from '@/components/app/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -19,11 +19,26 @@ export default async function DashboardPage() {
 
   const latest = notes.slice(0, 5);
 
+  // No clock reads during render: react-hooks/purity rightly refuses them,
+  // and a stat that changes between renders is a hydration mismatch waiting.
+  const words = notes.reduce(
+    (total, note) => total + (note.body.trim() ? note.body.trim().split(/\s+/).length : 0),
+    0,
+  );
+
+  // Ordered by created_at, so the most recently edited note is not notes[0].
+  const lastWritten =
+    notes.length === 0
+      ? '--'
+      : new Date(
+          Math.max(...notes.map((note) => new Date(note.updated_at).getTime())),
+        ).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+
   return (
     <>
       <PageHeader
         title={`Good to see you, ${profile.display_name.split(' ')[0]}`}
-        description="Everything below is scoped to your account by row-level security, not by a filter in the query."
+        description="Here is where you left off."
         actions={
           <Button asChild size="md">
             <Link href="/notes">
@@ -35,15 +50,15 @@ export default async function DashboardPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Your notes" value={String(notes.length)} />
-        <Stat label="Role" value={profile.role} tone={profile.role === 'admin' ? 'accent' : 'neutral'} />
-        <Stat label="Visible to others" value="0" />
+        <Stat label="Notes" value={String(notes.length)} />
+        <Stat label="Words" value={words.toLocaleString()} tone={words > 0 ? 'accent' : 'neutral'} />
+        <Stat label="Last written" value={lastWritten} />
       </div>
 
       <Card className="mt-8">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>Recent notes</CardTitle>
-          <Badge tone="accent">RLS enforced</Badge>
+          <Badge>Newest first</Badge>
         </CardHeader>
         <CardBody className="p-0">
           {latest.length === 0 ? (
@@ -51,7 +66,7 @@ export default async function DashboardPage() {
               <EmptyState
                 icon={FileText}
                 title="No notes yet"
-                description="Create one, then sign in as another seeded user to confirm it is invisible to them."
+                description="Anything you write will show up here."
                 action={
                   <Button asChild size="sm" variant="secondary">
                     <Link href="/notes">Go to notes</Link>
@@ -91,18 +106,6 @@ export default async function DashboardPage() {
         </CardBody>
       </Card>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <Callout
-          icon={ShieldCheck}
-          title="Isolation, verified"
-          body="pnpm check:rls fails the build if any table loses RLS, gains a USING (true) policy, or exposes a writable user_id column."
-        />
-        <Callout
-          icon={Sparkles}
-          title="Add a feature"
-          body="pnpm new:resource <name> writes the migration, policies, types, route and page. Then follow PATTERNS.md."
-        />
-      </div>
     </>
   );
 }
@@ -124,24 +127,6 @@ function Stat({
       >
         {value}
       </p>
-    </div>
-  );
-}
-
-function Callout({
-  icon: Icon,
-  title,
-  body,
-}: {
-  icon: typeof ShieldCheck;
-  title: string;
-  body: string;
-}) {
-  return (
-    <div className="rounded-[var(--radius-lg)] border border-border bg-bg-inset px-5 py-4">
-      <Icon aria-hidden className="size-4 text-accent" strokeWidth={1.75} />
-      <p className="mt-2.5 font-medium">{title}</p>
-      <p className="mt-1 text-sm leading-relaxed text-fg-muted">{body}</p>
     </div>
   );
 }
