@@ -13,7 +13,7 @@ import { TBody, TD, TH, THead, TR, Table } from '@/components/ui/table';
 import { cn } from '@/lib/cn';
 import type { Note } from '@/lib/db/notes';
 
-import { isPendingNote } from './notes-workspace';
+import { isPendingNote } from './pending';
 
 export type NoteListProps = {
   notes: Note[];

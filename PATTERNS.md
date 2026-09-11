@@ -137,6 +137,13 @@ Add `'/things'` to `PROTECTED_PREFIXES` in `src/proxy.ts` and to `MAIN` in
 **Admin-only page**: swap `requireUser()` for `requireAdmin()`. It renders a 404, not
 a 403, so a non-admin cannot confirm the surface exists.
 
+**A page that can call `notFound()` must not sit under a `loading.tsx`.** A loading
+boundary makes the route stream, and a streamed response has already sent `200` by the
+time the not-found boundary renders, so the visitor sees the right page under the wrong
+status. That is why the notes list lives in a `(list)` route group with its own
+`loading.tsx`, while `/notes/[id]` and `/admin` sit outside any loading boundary. Put
+skeletons on list pages; leave detail and gated pages unstreamed.
+
 **A `[id]` page** must treat a malformed id as 404, never as a validation error:
 
 ```tsx

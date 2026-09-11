@@ -5,7 +5,7 @@
  */
 'use client';
 
-import { useOptimistic, useRef, useState, useTransition } from 'react';
+import { useOptimistic, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText } from 'lucide-react';
 
@@ -20,15 +20,11 @@ import type { Note } from '@/lib/db/notes';
 
 import { NoteComposer } from './note-composer';
 import { NoteList } from './note-list';
+import { isPendingNote, pendingNoteId } from './pending';
 
 type Pending =
   | { kind: 'created'; note: Note }
   | { kind: 'deleted'; id: string };
-
-/** A note that exists only on this client until the server confirms it. */
-export function isPendingNote(id: string): boolean {
-  return id.startsWith('pending-');
-}
 
 export function NotesWorkspace({ notes }: { notes: Note[] }) {
   const router = useRouter();
@@ -41,13 +37,10 @@ export function NotesWorkspace({ notes }: { notes: Note[] }) {
       : current.filter((note) => note.id !== pending.id),
   );
 
-  // Survives the re-render that follows a delete, so Undo still knows the id.
-  const lastDeleted = useRef<string | null>(null);
-
   function create(title: string, body: string) {
     const now = new Date().toISOString();
     const optimistic: Note = {
-      id: `pending-${now}`,
+      id: pendingNoteId(),
       user_id: '',
       title,
       body,
@@ -83,7 +76,6 @@ export function NotesWorkspace({ notes }: { notes: Note[] }) {
         return;
       }
 
-      lastDeleted.current = note.id;
       toast('Note deleted', {
         description: note.title,
         action: { label: 'Undo', onClick: () => restore(note.id) },
@@ -99,7 +91,6 @@ export function NotesWorkspace({ notes }: { notes: Note[] }) {
         toast.error(result.message);
         return;
       }
-      lastDeleted.current = null;
       toast.success('Note restored');
       router.refresh();
     });

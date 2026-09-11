@@ -348,3 +348,19 @@ typing-driven state is set in the change handler.
 
 The scaffolder templates were updated to match, so every new resource gets soft
 delete and a restore helper.
+
+### Follow-up: the 404 status regression
+
+Adding a loading boundary to the whole protected group made those routes stream,
+which flushes a `200` before `notFound()` ever runs. Bob still saw the branded
+"we cannot find that" page with none of Alice's data, so nothing leaked, but the
+status code was wrong on exactly the routes where "not found" is an access
+control decision.
+
+Fixed by scoping the loading boundaries: the notes list now sits in a `(list)`
+route group with its own `loading.tsx`, so `/notes/[id]` and `/admin` stay
+unstreamed and return a real 404. The rule is recorded in CLAUDE.md rule 10 and
+PATTERNS.md section 2.
+
+`pnpm graph` then caught a circular import between the workspace and the list,
+introduced by putting `isPendingNote` in the workspace. Moved to its own file.

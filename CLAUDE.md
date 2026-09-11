@@ -38,6 +38,8 @@ Next 16 renamed `middleware.ts` to `proxy.ts`. `cookies()`, `headers()`, `params
    Lint enforces this.
 10. **Generic errors to the client.** No stack traces, no Postgres messages, no
     "user not found" vs "wrong password". Missing and forbidden both return 404.
+    A route that can call `notFound()` must not sit under a `loading.tsx`: a
+    loading boundary streams, and a streamed route has already sent 200.
 11. **`auth.getUser()`, never `auth.getSession()`** for any access decision.
     `getSession()` trusts a cookie the client controls. Lint enforces this.
 12. **Storage buckets are private.** Reads go through server-minted signed URLs.
