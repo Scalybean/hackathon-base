@@ -129,6 +129,20 @@ http://localhost:3000/**
 
 The wildcard entry is what makes preview deployments able to complete a signup.
 
+## What the app does
+
+The shipped example is a notes app, there to be replaced by your product. What
+is worth keeping is the interaction shape, which is product-agnostic:
+
+- **Search and jump** with `Cmd K` or `Ctrl K`. Searches your notes and the
+  navigation in one list.
+- **Writes are optimistic.** A new note appears before the server answers.
+- **Deleting is instant with an Undo**, not a confirmation dialog. Deletes are
+  soft, so Undo is a real operation and nothing is actually lost.
+- **New accounts start with one note** rather than an empty screen.
+- **Loading and error states** on every protected page, and a branded 404.
+- **A bottom tab bar on phones**, since the sidebar is desktop-only.
+
 ## Installable app
 
 The app is a PWA. On desktop Chrome or Edge the install button appears in the

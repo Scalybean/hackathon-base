@@ -8,12 +8,17 @@ create table public.__table__ (
   title      text not null check (char_length(title) between 1 and 200),
   body       text not null default '' check (char_length(body) <= 10000),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  -- Soft delete, so an accidental removal is recoverable and Undo is a real
+  -- operation. Every read in src/lib/db/__table__.ts filters on this.
+  deleted_at timestamptz
 );
 
 comment on table public.__table__ is 'Owned resource. Ownership is set by the auth.uid() column default, never by the client.';
 
-create index __table___user_id_created_at_idx on public.__table__ (user_id, created_at desc);
+create index __table___user_id_live_idx
+  on public.__table__ (user_id, created_at desc)
+  where deleted_at is null;
 
 create trigger __table___set_updated_at
   before update on public.__table__
@@ -25,7 +30,8 @@ create trigger __table___set_updated_at
 revoke all on public.__table__ from anon, authenticated;
 grant select on public.__table__ to authenticated;
 grant insert (title, body) on public.__table__ to authenticated;
-grant update (title, body) on public.__table__ to authenticated;
+-- deleted_at is writable on purpose: setting and clearing it IS delete and undo.
+grant update (title, body, deleted_at) on public.__table__ to authenticated;
 grant delete on public.__table__ to authenticated;
 
 -- ---------------------------------------------------------------------------

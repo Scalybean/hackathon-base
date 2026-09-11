@@ -84,6 +84,24 @@ users. Everything else becomes one generic 500. The client gets a short trace id
 correlates to the real error in the server log, so support is still possible without
 leaking anything.
 
+**Deletes are soft, and there is no confirmation dialog.** A dialog taxes the
+many intentional deletes in order to guard the rare accidental one. Instead the
+row disappears at once and the toast offers Undo, which is a real server
+operation because `deleted_at` is a column rather than a client-side timer. The
+failure mode is data preserved: if the undo never happens the row is still
+there. Every read in `src/lib/db/` filters `deleted_at is null`, which is why
+all queries for a table live in one file.
+
+**Writes are optimistic.** `useOptimistic` in `notes-workspace.tsx` shows a new
+row before the round trip finishes. The composer validates with the same Zod
+schema the server uses, so the error shown locally is the error the server
+would have given, and the two can never disagree.
+
+**The command palette is hand-rolled.** It is an input, a list and four key
+handlers, which is less code than the configuration a combobox library would
+need, and one fewer dependency. Search is debounced at 250ms with a two
+character minimum so holding a key down cannot outrun the read rate limit.
+
 **The service worker is a cache policy, not a caching library.** No Serwist, no
 next-pwa. Those default to caching pages and API responses, which is correct for
 a content site and a data leak for an authenticated one: a service worker cache

@@ -4,21 +4,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FileText, LayoutDashboard, Palette, Settings, ShieldCheck } from 'lucide-react';
 
+import { ADMIN, DEV, MAIN, isActive, type NavItem } from '@/components/app/nav-items';
 import { cn } from '@/lib/cn';
-
-type NavItem = { href: string; label: string; icon: typeof FileText };
-
-const MAIN: NavItem[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/notes', label: 'Notes', icon: FileText },
-  { href: '/settings', label: 'Settings', icon: Settings },
-];
-
-const ADMIN: NavItem[] = [{ href: '/admin', label: 'Admin', icon: ShieldCheck }];
-
-const DEV: NavItem[] = [{ href: '/styleguide', label: 'Styleguide', icon: Palette }];
 
 export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
@@ -57,7 +45,7 @@ function Section({ items, pathname }: { items: NavItem[]; pathname: string }) {
   return (
     <ul className="space-y-0.5">
       {items.map(({ href, label, icon: Icon }) => {
-        const active = pathname === href || pathname.startsWith(`${href}/`);
+        const active = isActive(pathname, href);
         return (
           <li key={href}>
             <Link

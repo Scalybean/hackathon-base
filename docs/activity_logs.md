@@ -288,3 +288,63 @@ render is non-deterministic. Replaced with a word count derived from the data.
   invite misuse. It is, however, linked from the public landing page.
 - The seeded note bodies still read "Bob must never see this", because the
   ten-second isolation check in the README depends on them being identifiable.
+
+---
+
+## 2026-09-11 (later) — same session — the five product changes
+
+### Prompt
+
+> what do you recommend in terms of future features? Think user, not behind the
+> scenes
+
+and, after the recommendation,
+
+> Great I like all of these go ahead
+
+### Two defects fixed
+
+- **No mobile navigation.** The sidebar was desktop-only and the app had just
+  been made installable on phones. Added a bottom tab bar, safe-area aware, and
+  moved the nav definition into `src/components/app/nav-items.ts` so the
+  sidebar and the tab bar cannot drift.
+- **No loading or error states.** Added `loading.tsx` and `error.tsx` for the
+  protected group, a branded `not-found.tsx`, and a self-contained
+  `global-error.tsx`. The error boundary shows only the digest, never
+  `error.message`, which can carry server detail.
+
+### Three features
+
+- **Optimistic writes and Undo.** `notes-workspace.tsx` owns the list and the
+  composer so both share one optimistic state. Deletes are now soft
+  (`deleted_at`), which makes Undo a real server operation rather than a
+  client-side timer, and means the failure mode is data preserved. The composer
+  validates with the same Zod schema the server uses.
+- **Command palette.** Cmd K or Ctrl K, searching notes and navigation in one
+  list. Hand-rolled rather than adding a combobox dependency. Debounced at
+  250ms with a two character minimum so it cannot outrun the read rate limit.
+- **Welcome note on signup**, created by the signup trigger and wrapped so a
+  failure can never block a registration. The seed script removes it for its
+  three fixture accounts to keep the documented isolation counts exact.
+
+### Security work that came with it
+
+`escapeSearchTerm()` is the one place user input reaches a PostgREST filter
+string. PostgREST parses commas, parentheses, dots, quotes, colons and stars as
+structure, so an unescaped term could rewrite the query. It strips all of them,
+neutralises the LIKE wildcards, and caps the length. Covered by
+`tests/search-term.test.ts` and recorded as attack 17 in SECURITY.md.
+
+Verified against the database: the owner can restore, another user cannot
+soft-delete someone else's row, and forging `user_id` during an update is still
+refused by the column grants.
+
+### Bug found
+
+`react-hooks/set-state-in-effect` refused two synchronous setState calls in the
+palette's effects. Both were "sync with an effect" where "derive during render"
+was correct: the highlighted row is now clamped rather than reset, and the
+typing-driven state is set in the change handler.
+
+The scaffolder templates were updated to match, so every new resource gets soft
+delete and a restore helper.

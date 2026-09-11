@@ -28,6 +28,7 @@ Next 16 renamed `middleware.ts` to `proxy.ts`. `cookies()`, `headers()`, `params
    If you write a handler without the wrapper, you have made a mistake.
 6. **Re-check ownership in the query.** Every `[id]` path filters on `user_id` as
    well as `id`, even though RLS also blocks it. Use the helpers in `src/lib/db/`.
+   Deletes are soft: every read also filters `deleted_at is null`.
 7. **Rate limit everything that writes or costs money.** Pick a name from
    `RATE_LIMITS`: `auth`, `mutation`, `read`, `expensive`. There is no unlimited route.
 8. **`SUPABASE_SERVICE_ROLE_KEY` is server-only.** Never in a client component, never
@@ -95,7 +96,7 @@ Next 16 renamed `middleware.ts` to `proxy.ts`. `cookies()`, `headers()`, `params
 | a UI primitive | `src/components/ui/`, tokens only, add it to `/styleguide`. PATTERNS.md §6 |
 | a file upload | private bucket + signed URL. PATTERNS.md §7 |
 | an env var | `.env.example` **and** the Zod schema in `src/lib/env/{client,server}.ts` |
-| a nav entry | `MAIN` in `src/components/app/sidebar.tsx` |
+| a nav entry | `MAIN` in `src/components/app/nav-items.ts` (sidebar and tab bar share it) |
 | a PWA icon or name | `src/app/manifest.ts`, icons via `python3 scripts/generate-icons.py` |
 | a protected prefix | `PROTECTED_PREFIXES` in `src/proxy.ts` |
 

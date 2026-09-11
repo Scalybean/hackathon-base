@@ -112,6 +112,6 @@ Next, in order:
   2. pnpm db:push          apply the migration
   3. pnpm types            regenerate src/types/database.ts
   4. Add '/${table}' to PROTECTED_PREFIXES in src/proxy.ts
-  5. Add a nav entry to MAIN in src/components/app/sidebar.tsx
+  5. Add a nav entry to MAIN in src/components/app/nav-items.ts
   6. pnpm verify
 `);

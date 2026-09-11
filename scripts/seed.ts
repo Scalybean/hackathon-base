@@ -103,6 +103,10 @@ async function main() {
       if (roleError) throw roleError;
     }
 
+    // Real signups get a welcome note from the trigger. The seed is a fixture
+    // for the isolation check, so its counts stay exactly what the README says.
+    await admin.from('notes').delete().eq('user_id', userId).eq('title', 'Start here');
+
     if (seed.notes.length > 0) {
       const { error: notesError } = await admin
         .from('notes')

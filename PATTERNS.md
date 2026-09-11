@@ -28,7 +28,7 @@ pnpm types          # 3. regenerate src/types/database.ts, and commit it
 ```
 
 Finally add `'/tasks'` to `PROTECTED_PREFIXES` in `src/proxy.ts` and a nav entry to
-`MAIN` in `src/components/app/sidebar.tsx`, then `pnpm verify`.
+`MAIN` in `src/components/app/nav-items.ts`, then `pnpm verify`.
 
 ### If you must write the migration yourself
 
@@ -67,6 +67,10 @@ create policy things_delete_own on public.things
 
 `(select auth.uid())` rather than bare `auth.uid()`: Postgres evaluates the subquery
 once per statement instead of once per row.
+
+The scaffolder also adds a nullable `deleted_at` and grants it to the client, because
+deletes are soft: setting it is the delete, clearing it is the Undo. Every read in the
+generated query helper filters `deleted_at is null`.
 
 For an admin-readable table, add a **separate** policy. Never widen an existing one:
 
@@ -127,7 +131,8 @@ export default async function ThingsPage() {
 }
 ```
 
-Add `'/things'` to `PROTECTED_PREFIXES` in `src/proxy.ts`.
+Add `'/things'` to `PROTECTED_PREFIXES` in `src/proxy.ts` and to `MAIN` in
+`src/components/app/nav-items.ts`, which the sidebar and the mobile tab bar share.
 
 **Admin-only page**: swap `requireUser()` for `requireAdmin()`. It renders a 404, not
 a 403, so a non-admin cannot confirm the surface exists.

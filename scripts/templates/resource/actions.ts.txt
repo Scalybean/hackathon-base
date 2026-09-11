@@ -8,7 +8,12 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { action } from '@/lib/api/action';
-import { create__Entity__, delete__Entity__, update__Entity__ } from '@/lib/db/__table__';
+import {
+  create__Entity__,
+  delete__Entity__,
+  restore__Entity__,
+  update__Entity__,
+} from '@/lib/db/__table__';
 import {
   create__Entity__Schema,
   __entity__IdSchema,
@@ -42,5 +47,15 @@ export const delete__Entity__Action = action(
     await delete__Entity__(supabase, user.id, input.id);
     revalidatePath('/__table__');
     return { id: input.id };
+  },
+);
+
+/** What an Undo in a delete toast calls. */
+export const restore__Entity__Action = action(
+  { rateLimit: 'mutation', input: z.object({ id: __entity__IdSchema }) },
+  async ({ input, supabase, user }) => {
+    const row = await restore__Entity__(supabase, user.id, input.id);
+    revalidatePath('/__table__');
+    return row;
   },
 );

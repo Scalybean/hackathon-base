@@ -1,27 +1,48 @@
-/** Create-note form. Pending state, field errors and a toast on success. */
+/**
+ * Create form. Validates with the same Zod schema the server uses, so the
+ * error a user sees locally is the error the server would have given, and the
+ * note can appear in the list before the round trip finishes.
+ */
 'use client';
 
-import { useActionState, useEffect, useRef } from 'react';
+import { useRef, useState } from 'react';
 
-import { createNoteAction } from '@/app/(app)/notes/actions';
 import { FormError } from '@/components/form/form-error';
-import { fieldError, formError, toFormAction } from '@/components/form/form-state';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input, Textarea } from '@/components/ui/input';
 import { Field } from '@/components/ui/label';
-import { toast } from '@/components/ui/toast';
+import { createNoteSchema } from '@/lib/schemas/notes';
 
-export function NoteComposer() {
-  const [state, formAction, pending] = useActionState(toFormAction(createNoteAction), null);
+export type NoteComposerProps = {
+  onCreate: (title: string, body: string) => void;
+  pending: boolean;
+};
+
+export function NoteComposer({ onCreate, pending }: NoteComposerProps) {
   const form = useRef<HTMLFormElement>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    if (state?.ok) {
-      toast.success('Note created');
-      form.current?.reset();
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    const parsed = createNoteSchema.safeParse({
+      title: data.get('title'),
+      body: data.get('body') ?? '',
+    });
+
+    if (!parsed.success) {
+      const next: Record<string, string> = {};
+      for (const issue of parsed.error.issues) next[issue.path.join('.')] ??= issue.message;
+      setErrors(next);
+      return;
     }
-  }, [state]);
+
+    setErrors({});
+    onCreate(parsed.data.title, parsed.data.body);
+    form.current?.reset();
+  }
 
   return (
     <Card>
@@ -29,20 +50,20 @@ export function NoteComposer() {
         <CardTitle>New note</CardTitle>
       </CardHeader>
       <CardBody>
-        <form ref={form} action={formAction} className="space-y-4" noValidate>
-          <FormError message={formError(state)} />
+        <form ref={form} onSubmit={submit} className="space-y-4" noValidate>
+          <FormError message={errors._} />
 
-          <Field label="Title" htmlFor="title" error={fieldError(state, 'title')}>
+          <Field label="Title" htmlFor="title" error={errors.title}>
             <Input
               id="title"
               name="title"
               required
               maxLength={200}
-              aria-invalid={Boolean(fieldError(state, 'title'))}
+              aria-invalid={Boolean(errors.title)}
             />
           </Field>
 
-          <Field label="Body" htmlFor="body" error={fieldError(state, 'body')}>
+          <Field label="Body" htmlFor="body" error={errors.body}>
             <Textarea id="body" name="body" maxLength={10000} rows={5} />
           </Field>
 

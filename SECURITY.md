@@ -173,6 +173,20 @@ registered with `updateViaCache: 'none'`, so the browser always revalidates it.
 The worker calls `skipWaiting()` and `clients.claim()`, and its activate step
 deletes every cache that is not the current version.
 
+### 17. Rewrite the search query through the search box
+
+**Try**: search for `x,user_id.neq.00000000-0000-0000-0000-000000000000`, or for
+`%`.
+
+**Blocked**: the search term is the one place user input is concatenated into a
+PostgREST filter string, and PostgREST parses `,` `(` `)` `.` `"` `:` and `*`
+as structure. `escapeSearchTerm()` (`src/lib/db/notes.ts`) strips every one of
+them, neutralises the LIKE wildcards `%` and `_`, and caps the term at 100
+characters. The query is still bounded by `user_id` and RLS regardless, so a
+successful injection would have had to defeat three things.
+
+**Proven by**: `tests/search-term.test.ts`.
+
 ## Tightening the CSP
 
 The CSP ships **report-only** so a missed directive breaks the console rather than the
