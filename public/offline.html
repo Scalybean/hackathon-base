@@ -1,0 +1,83 @@
+<!doctype html>
+<!--
+  The offline fallback. Deliberately a static file rather than a Next route:
+  the service worker caches this, and a cached server-rendered page could
+  carry one user's data to the next person on a shared device.
+  Self-contained on purpose, so it works even when nothing else does.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline · hackathon-base</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #faf7f2;
+        --fg: #1a1714;
+        --fg-muted: #5b5247;
+        --accent: #b4451f;
+        --border: #e4ded2;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #100e0c;
+          --fg: #f2ede4;
+          --fg-muted: #a79b88;
+          --accent: #db7350;
+          --border: #322c26;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 2rem 1.5rem;
+        background: var(--bg);
+        color: var(--fg);
+        font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif;
+        letter-spacing: 0.005em;
+      }
+      main { max-width: 26rem; }
+      .rule {
+        height: 2px;
+        margin-bottom: 2rem;
+        background-image: linear-gradient(90deg, var(--accent) 0 2.5rem, var(--border) 2.5rem 100%);
+      }
+      h1 {
+        margin: 0;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 2rem;
+        line-height: 1.15;
+        letter-spacing: -0.015em;
+      }
+      p { margin: 0.75rem 0 0; color: var(--fg-muted); }
+      button {
+        margin-top: 1.75rem;
+        padding: 0 1.25rem;
+        height: 2.75rem;
+        border: 0;
+        border-radius: 5px;
+        background: var(--accent);
+        color: #fdfbf8;
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      button:hover { filter: brightness(1.08); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="rule"></div>
+      <h1>You are offline</h1>
+      <p>
+        This page needs a connection. Nothing has been lost; reload once you are
+        back online.
+      </p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>

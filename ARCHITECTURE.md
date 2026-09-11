@@ -84,6 +84,15 @@ users. Everything else becomes one generic 500. The client gets a short trace id
 correlates to the real error in the server log, so support is still possible without
 leaking anything.
 
+**The service worker is a cache policy, not a caching library.** No Serwist, no
+next-pwa. Those default to caching pages and API responses, which is correct for
+a content site and a data leak for an authenticated one: a service worker cache
+is shared by everyone who uses the device. `public/sw.js` is 130 lines of plain
+JavaScript with an allow-list of content-hashed build output, and its policy is
+asserted by a test that evaluates the shipped file rather than a copy. The
+offline fallback is a static HTML file for the same reason: a server-rendered
+fallback would be a cached page.
+
 **Tokens, not utilities, carry the theme.** Components use semantic roles
 (`bg-raised`, `fg-muted`, `accent-soft`) that are redefined once for dark mode. No
 component writes a `dark:` utility, so there is exactly one place to change a colour.
@@ -137,5 +146,6 @@ publicly reachable while preview builds still require a Vercel login.
 | `REPOMAP.md` | `pnpm map` + `pnpm graph` | yes — it is the repo index |
 | `pnpm-lock.yaml` | pnpm | yes |
 | the eight files from `pnpm new:resource` | scaffolder | yes, after you edit the migration |
+| `public/icon-*.png`, `public/apple-touch-icon.png` | `python3 scripts/generate-icons.py` | yes |
 
 Regenerate types and the map in the same commit as the change that made them stale.

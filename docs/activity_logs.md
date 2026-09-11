@@ -205,3 +205,41 @@ the styleguide XSS payload renders with zero occurrences of `alert(1)`.
   valid `SUPABASE_DB_URL` is set. The same seven queries were run against the dev
   database out of band and returned zero violations.
 - Vercel is not connected to the GitHub repository, so pushes do not deploy.
+
+---
+
+## 2026-09-11 — same session — make the app a PWA
+
+### Prompt
+
+> Make the app into a PWA
+
+### Actions
+
+1. **Icons** generated from the design tokens by `scripts/generate-icons.py`,
+   rather than committed as binaries nobody can regenerate. Clay ground, cream
+   rule and full stop, echoing the wordmark. 192, 512, maskable 512 and a
+   180px Apple touch icon.
+2. **`src/app/manifest.ts`** with standalone display, the clay theme colour,
+   `start_url` of `/dashboard`, and shortcuts to Notes and Settings.
+3. **`public/sw.js`**, written by hand rather than pulled from Serwist or
+   next-pwa. Those default to caching pages and API responses, which is right
+   for a content site and a cross-user data leak for an authenticated one.
+4. **`public/offline.html`**, a static self-contained fallback. A Next route
+   would mean caching a server-rendered page, which is the thing to avoid.
+5. **`tests/sw-cache-policy.test.ts`**, 31 assertions evaluated against the
+   shipped `public/sw.js` rather than a copy, so the policy cannot drift.
+6. Sign-out now clears every cache as defence in depth.
+7. `/sw.js` is served no-store with its own tighter CSP and a root
+   `Service-Worker-Allowed` scope, and registered with `updateViaCache: 'none'`,
+   so a stale worker cannot pin itself in place.
+8. The proxy matcher now skips `sw.js`, `offline.html` and the manifest, so
+   fetching them costs no session refresh.
+
+### Security notes
+
+Two new entries in SECURITY.md: reading the previous user's data out of the
+service worker cache, and pinning a stale worker. A thirteenth hard rule in
+CLAUDE.md: the worker caches build artefacts only.
+
+Registration is production-only, so `pnpm dev` never serves a stale chunk.

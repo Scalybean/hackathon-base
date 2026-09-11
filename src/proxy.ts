@@ -57,7 +57,8 @@ function withSecurityHeaders(response: NextResponse, csp: string, nonce: string)
 export const config = {
   matcher: [
     // Everything except static assets and the image optimiser. API routes are
-    // included so they get the security headers too.
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)',
+    // included so they get the security headers too. The PWA files are excluded
+    // so fetching the worker or the manifest does not cost a session refresh.
+    '/((?!_next/static|_next/image|favicon.ico|sw\\.js|offline\\.html|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$).*)',
   ],
 };

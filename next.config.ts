@@ -31,7 +31,22 @@ const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: false },
 
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      {
+        // The worker must never be stale: a pinned old worker keeps serving an
+        // old cache policy. Its own CSP is tighter than the page's, because it
+        // legitimately needs nothing but same-origin script.
+        source: '/sw.js',
+        headers: [
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self'" },
+          // Root scope, so one worker covers the whole app.
+          { key: 'Service-Worker-Allowed', value: '/' },
+        ],
+      },
+    ];
   },
 };
 

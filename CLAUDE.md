@@ -41,6 +41,9 @@ Next 16 renamed `middleware.ts` to `proxy.ts`. `cookies()`, `headers()`, `params
     `getSession()` trusts a cookie the client controls. Lint enforces this.
 12. **Storage buckets are private.** Reads go through server-minted signed URLs.
     Object keys start with the owner's user id.
+13. **The service worker caches build artefacts only.** Never HTML, never
+    `/api/*`, never anything credentialed. A cache is shared by everyone on the
+    device. Edit `public/sw.js` only with `tests/sw-cache-policy.test.ts` open.
 
 ## Commands
 
@@ -70,6 +73,7 @@ Next 16 renamed `middleware.ts` to `proxy.ts`. `cookies()`, `headers()`, `params
 | `src/lib/db/` | one query-helper file per table; ownership re-checked here |
 | `src/lib/schemas/` | one Zod file per resource; no `user_id` fields, ever |
 | `src/lib/supabase/` | `browser`, `server`, `proxy`, `admin` clients |
+| `src/lib/pwa/` | service worker registration and cache teardown |
 | `src/lib/rate-limit/` | limiter interface, memory and Upstash implementations |
 | `src/lib/security/` | the CSP builder |
 | `src/lib/storage/` | private-bucket paths and signed URLs |
@@ -92,6 +96,7 @@ Next 16 renamed `middleware.ts` to `proxy.ts`. `cookies()`, `headers()`, `params
 | a file upload | private bucket + signed URL. PATTERNS.md §7 |
 | an env var | `.env.example` **and** the Zod schema in `src/lib/env/{client,server}.ts` |
 | a nav entry | `MAIN` in `src/components/app/sidebar.tsx` |
+| a PWA icon or name | `src/app/manifest.ts`, icons via `python3 scripts/generate-icons.py` |
 | a protected prefix | `PROTECTED_PREFIXES` in `src/proxy.ts` |
 
 ## House style

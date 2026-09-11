@@ -129,6 +129,29 @@ http://localhost:3000/**
 
 The wildcard entry is what makes preview deployments able to complete a signup.
 
+## Installable app
+
+The app is a PWA. On desktop Chrome or Edge the install button appears in the
+address bar; on iOS use Share, then Add to Home Screen. Installed, it opens
+standalone on `/dashboard` with the clay theme colour in the window chrome.
+
+Icons are generated from the design tokens rather than checked in as mystery
+binaries. Change the mark in `scripts/generate-icons.py` and run
+`python3 scripts/generate-icons.py`. Change the name or colours in
+`src/app/manifest.ts`.
+
+There is an offline fallback, `public/offline.html`, shown when a navigation
+fails with no connection.
+
+**The service worker caches build output only.** Never HTML, never `/api/*`,
+never anything carrying a session. A service worker cache is shared by everyone
+who uses the device, so one cached page from a signed-in user is a leak to the
+next one. `tests/sw-cache-policy.test.ts` asserts this against the shipped
+`public/sw.js`. If you edit the worker, keep that test open.
+
+The worker only registers in production builds, so `pnpm dev` is never serving
+you a stale chunk.
+
 ## Secret scanning
 
 The repository is **public**, so GitHub's secret scanning and push protection are

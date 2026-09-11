@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { LogOut, Settings, ShieldCheck } from 'lucide-react';
 
+import { clearServiceWorkerCaches } from '@/lib/pwa/client';
 import { Avatar } from '@/components/ui/avatar';
 import {
   Dropdown,
@@ -31,6 +32,8 @@ export function UserMenu({ displayName, email, avatarUrl, isAdmin }: UserMenuPro
   function signOut() {
     startTransition(async () => {
       await fetch('/api/auth/sign-out', { method: 'POST' });
+      // Leave nothing behind on a shared device.
+      await clearServiceWorkerCaches();
       router.replace('/login');
       router.refresh();
     });

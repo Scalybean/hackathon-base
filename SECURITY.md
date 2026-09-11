@@ -142,6 +142,37 @@ server-side under a trace id the client also receives.
 uses it, and third-party keys live only in `src/lib/env/server.ts`, so no browser can
 call the provider directly.
 
+### 15. Read the previous user's data out of the service worker cache
+
+**Try**: sign in on a shared or borrowed device, sign out, then look for cached
+pages or API responses that the next person's browser will happily replay.
+
+**Blocked**: the worker caches build artefacts and nothing else
+(`public/sw.js`). Six independent conditions must all hold before anything is
+stored: the request is a GET, same-origin, not a navigation, not a document
+destination, not credentialed, and its path matches an allow-list of
+content-hashed `_next/static` output plus the brand icons. `/api/*`, `/auth/*`
+and the auth pages are additionally denied outright, so widening the allow-list
+by accident cannot expose them. Only a clean same-origin 200 is stored, so an
+opaque or errored response cannot poison the cache.
+
+The offline fallback is a **static file**, `public/offline.html`, not a Next
+route. A server-rendered fallback would be a cached HTML page, which is exactly
+the thing that leaks. Sign-out also clears all caches as defence in depth.
+
+**Proven by**: `tests/sw-cache-policy.test.ts`, which evaluates the shipped
+`public/sw.js` rather than a copy, so the policy cannot drift from what runs.
+
+### 16. Pin a stale service worker
+
+**Try**: get a worker with a permissive policy installed, then keep it alive so
+later fixes never reach the device.
+
+**Blocked**: `/sw.js` is served `no-cache, no-store, must-revalidate`, and is
+registered with `updateViaCache: 'none'`, so the browser always revalidates it.
+The worker calls `skipWaiting()` and `clients.claim()`, and its activate step
+deletes every cache that is not the current version.
+
 ## Tightening the CSP
 
 The CSP ships **report-only** so a missed directive breaks the console rather than the
